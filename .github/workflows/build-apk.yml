@@ -32,14 +32,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android Build Tools and Platform
-        run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -55,6 +47,15 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+
+      - name: Ensure Android SDK Platform & Build-tools
+        run: |
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKMANAGER" ]; then
+            yes | "$SDKMANAGER" --licenses || true
+            "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" || true
+          fi
 
       - name: Build Android APK
         env:
