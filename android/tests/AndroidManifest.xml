@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.yoruichi.mobile.tests">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <application android:label="Yoruichi verification"><activity android:name="com.yoruichi.mobile.tests.ExternalTestActivity" android:exported="true"/></application>
+  <instrumentation android:name="com.yoruichi.mobile.tests.SmokeInstrumentation" android:targetPackage="com.yoruichi.mobile" android:label="Yoruichi native smoke tests"/>
+  <instrumentation android:name="com.yoruichi.mobile.tests.AuthInstrumentation" android:targetPackage="com.yoruichi.mobile" android:label="Yoruichi isolated authentication tests"/>
+  <instrumentation android:name="com.yoruichi.mobile.tests.ActionsInstrumentation" android:targetPackage="com.yoruichi.mobile" android:label="Yoruichi mobile action tests"/>
+</manifest>

@@ -1,0 +1,34 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+*.zip
+.myraa-data/
+cognition/*.json
+.env*
+!.env.example
+
+# Build outputs
+build/*
+!build/icon.png
+
+# Private runtime data and generated releases
+secrets.json
+secrets.v2.json
+settings.json
+memories.json
+release/
+release-public/
+agent_build*/
+agent_dist*/
+.codex-backup-*/
+.serena/
+**/__pycache__/
+*.pyc
+android/.gradle/
+android/local.properties
+android/app/build/
+android/local-debug.keystore
+android/*.keystore
+artifacts/

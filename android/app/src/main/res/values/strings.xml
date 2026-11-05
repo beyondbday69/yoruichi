@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yoruichi</string>
+    <string name="live_voice_channel">Yoruichi Live Voice</string>
+    <string name="live_voice_title">Yoruichi Live · Microphone on</string>
+    <string name="live_voice_desc">Speak while using other apps. Stop ends the call.</string>
+</resources>

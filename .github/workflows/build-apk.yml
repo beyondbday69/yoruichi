@@ -1,0 +1,103 @@
+name: Build Yoruichi Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "Create a GitHub Release with the APK"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build & Package Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Build Tools and Platform
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Python Pillow for icon generation
+        run: pip install Pillow
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Android APK
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        run: |
+          chmod +x scripts/build-android.sh
+          bash scripts/build-android.sh
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Yoruichi-Mobile-APK
+          path: artifacts/android/Yoruichi-Mobile-v1.0.0.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Create GitHub Release (Tags or Manual Dispatch)
+        if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/android/Yoruichi-Mobile-v1.0.0.apk
+          tag_name: ${{ github.ref_name || 'v1.0.0' }}
+          name: Yoruichi Mobile Release ${{ github.ref_name || 'v1.0.0' }}
+          draft: false
+          prerelease: false
+          body: |
+            ## ⚡ Yoruichi 3D Mobile AI Assistant v1.0.0
+
+            ### 📱 What is Yoruichi?
+            Yoruichi is an expressive 3D AI companion and mobile assistant powered by Google Gemini. She provides real-time voice conversation, 3D interactive holographic avatar animations, and native Android phone controls.
+
+            ### ✨ Key Features:
+            - **Interactive 3D Avatar**: Real-time 3D cyber-anime character with natural eye-gaze tracking, audio-reactive waveform equalizers, breathing, blinking, and gesture responses (Wave, Smile, Sit, Stand, Portrait).
+            - **Phone Control & Native Actions**:
+              - Launch apps by voice / text: WhatsApp, YouTube, Chrome, Settings, etc.
+              - Search YouTube directly: *"YouTube search [song]"* or *"YouTube pe gaane bajao"*
+              - Search Google / Chrome: *"Chrome pe search karo [topic]"*
+              - Message drafting in WhatsApp: *"Message Rahul on WhatsApp: [message]"*
+            - **Bilingual & Hinglish Support**: Native conversational Hindi, Hinglish, and English matching.
+            - **Privacy First**: Secure AES-GCM encrypted API key storage via Android Keystore. All conversations stay on-device.
+
+            ### 📥 Download & Install:
+            Download the signed APK below:
+            - **`Yoruichi-Mobile-v1.0.0.apk`**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
