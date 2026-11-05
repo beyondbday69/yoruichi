@@ -111,16 +111,19 @@ def create_yoruichi_icon(size=512):
     return result
 
 if __name__ == "__main__":
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     icon = create_yoruichi_icon(512)
     
-    os.makedirs("/root/yoruichi/build", exist_ok=True)
-    os.makedirs("/root/yoruichi/android/app/src/main/res/drawable", exist_ok=True)
+    build_dir = os.path.join(project_root, "build")
+    drawable_dir = os.path.join(project_root, "android", "app", "src", "main", "res", "drawable")
+    
+    os.makedirs(build_dir, exist_ok=True)
+    os.makedirs(drawable_dir, exist_ok=True)
     
     # Save standard icon
-    icon.save("/root/yoruichi/build/icon.png", "PNG")
-    icon.save("/root/yoruichi/android/app/src/main/res/drawable/yoruichi_icon.png", "PNG")
-    # Also save as myraa_icon for fallback compatibility
-    icon.save("/root/yoruichi/android/app/src/main/res/drawable/myraa_icon.png", "PNG")
+    icon.save(os.path.join(build_dir, "icon.png"), "PNG")
+    icon.save(os.path.join(drawable_dir, "yoruichi_icon.png"), "PNG")
+    icon.save(os.path.join(drawable_dir, "myraa_icon.png"), "PNG")
 
     # Mipmap densities
     densities = {
@@ -131,10 +134,10 @@ if __name__ == "__main__":
         "mipmap-xxxhdpi": 192,
     }
     for folder, dim in densities.items():
-        path = f"/root/yoruichi/android/app/src/main/res/{folder}"
+        path = os.path.join(project_root, "android", "app", "src", "main", "res", folder)
         os.makedirs(path, exist_ok=True)
         resized = icon.resize((dim, dim), Image.Resampling.LANCZOS)
-        resized.save(f"{path}/yoruichi_icon.png", "PNG")
-        resized.save(f"{path}/myraa_icon.png", "PNG")
+        resized.save(os.path.join(path, "yoruichi_icon.png"), "PNG")
+        resized.save(os.path.join(path, "myraa_icon.png"), "PNG")
 
     print("Yoruichi icons created successfully!")

@@ -35,7 +35,6 @@ for api in 35 34 33; do
 done
 
 if [[ -z "$ANDROID_JAR" ]]; then
-  # Grab first available
   ANDROID_JAR=$(find "$SDK_ROOT/platforms" -name "android.jar" | sort -V | tail -n 1 || true)
 fi
 
@@ -45,8 +44,19 @@ if [[ -z "$ANDROID_JAR" || ! -f "$ANDROID_JAR" ]]; then
 fi
 echo "Using Platform: $ANDROID_JAR"
 
-# Locate build-tools
-BUILD_TOOLS_DIR=$(find "$SDK_ROOT/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1 || true)
+# Locate build-tools (favor 35.0.0, fallback to 34.0.0, or latest)
+BUILD_TOOLS_DIR=""
+for ver in 35.0.0 34.0.0; do
+  if [[ -d "$SDK_ROOT/build-tools/$ver" ]]; then
+    BUILD_TOOLS_DIR="$SDK_ROOT/build-tools/$ver"
+    break
+  fi
+done
+
+if [[ -z "$BUILD_TOOLS_DIR" ]]; then
+  BUILD_TOOLS_DIR=$(find "$SDK_ROOT/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1 || true)
+fi
+
 if [[ -z "$BUILD_TOOLS_DIR" ]]; then
   echo "Error: No build-tools found under $SDK_ROOT/build-tools."
   exit 1
